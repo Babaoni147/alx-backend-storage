@@ -1,42 +1,30 @@
 #!/usr/bin/env python3
-"""
-Provide some stats about Nginx logs stored in MongoDB
-Database: logs, Collection: nginx
-Displays:
-    - Total number of log entries
-    - Counts of each HTTP method (GET, POST, PUT, PATCH, DELETE)
-    - Count of requests with path /status
-"""
-
+'''Task 12's module.
+'''
 from pymongo import MongoClient
 
-METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"]
+
+def print_nginx_request_logs(nginx_collection):
+    '''Prints stats about Nginx request logs.
+    '''
+    print('{} logs'.format(nginx_collection.count_documents({})))
+    print('Methods:')
+    methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+    for method in methods:
+        req_count = len(list(nginx_collection.find({'method': method})))
+        print('\tmethod {}: {}'.format(method, req_count))
+    status_checks_count = len(list(
+        nginx_collection.find({'method': 'GET', 'path': '/status'})
+    ))
+    print('{} status check'.format(status_checks_count))
 
 
-def log_stats(mongo_collection):
-    """
-    Prints statistics about Nginx logs stored in MongoDB.
-    Args:
-        mongo_collection: MongoDB collection object
-    """
-    # Count total documents in the collection
-    total_logs = mongo_collection.count_documents({})
-    print(f"{total_logs} logs")
-
-    # Count for each HTTP method
-    print("Methods:")
-    for method in METHODS:
-        count = mongo_collection.count_documents({"method": method})
-        print(f"\tmethod {method}: {count}")
-
-    # Count requests with path `/status`
-    status_count = mongo_collection.count_documents({"method": "GET",
-                                                     "path": "/status"})
-    print(f"{status_count} status check")
-
-
-if __name__ == "__main__":
-    # Connect to MongoDB and access the collection
+def run():
+    '''Provides some stats about Nginx logs stored in MongoDB.
+    '''
     client = MongoClient('mongodb://127.0.0.1:27017')
-    nginx_collection = client.logs.nginx
-    log_stats(nginx_collection)
+    print_nginx_request_logs(client.logs.nginx)
+
+
+if __name__ == '__main__':
+    run()
