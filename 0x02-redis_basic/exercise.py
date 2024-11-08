@@ -33,12 +33,11 @@ def call_history(method: Callable) -> Callable:
         self._redis.rpush(output_key, str(result))
 
         return result
-
     return wrapper
 
 
 def replay(fn: Callable):
-    '''display the history of calls of a particular function.'''
+    """display the history of calls of a particular function."""
     r = redis.Redis()
     func_name = fn.__qualname__
     c = r.get(func_name)
@@ -78,13 +77,16 @@ class Cache:
 
     def get(self, key: str, fn: Optional[Callable[[bytes],
                                                   Any]] = None) -> Any:
+        """Gets the value of a key from Redis."""
         value = self._redis.get(key)
         if value is None:
             return None
         return fn(value) if fn else value
 
     def get_str(self, key: str) -> Optional[str]:
+        """Gets the value of a key from Redis as a string."""
         return self.get(key, lambda v: v.decode('utf-8'))
 
     def get_int(self, key: str) -> Optional[int]:
+        """Gets the value of a key from Redis as an integer."""
         return self.get(key, int)
