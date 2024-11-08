@@ -33,6 +33,5 @@ def count_url_access(method):
 @count_url_access
 def get_page(url: str) -> str:
     """ Returns HTML content of a url """
-    """ Returns HTML content of a url """
     res = requests.get(url)
     return res.text
