@@ -31,13 +31,7 @@ def count_url_access(method):
 
 
 @count_url_access
-@count_calls
-def get_page(self, url: str) -> str:
-    """Fetches a page from the given URL, potentially using the cache."""
-    key = f"page:{url}"
-    value = self._redis.get(key)
-    if value is None:
-        # Fetch from external source
-        value = fetch_from_url(url)
-        self._redis.set(key, value, ex=10)  # Set expiration for fetched data
-    return value.decode('utf-8')
+def get_page(url: str) -> str:
+    """ Returns HTML content of a url """
+    res = requests.get(url)
+    return res.text
