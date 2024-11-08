@@ -14,6 +14,7 @@ def count_url_access(method):
     a URL is accessed """
     @wraps(method)
     def wrapper(url):
+        """ Wrapper function """
         cached_key = "cached:" + url
         cached_data = store.get(cached_key)
         if cached_data:
@@ -31,6 +32,7 @@ def count_url_access(method):
 
 @count_url_access
 def get_page(url: str) -> str:
+    """ Returns HTML content of a url """
     """ Returns HTML content of a url """
     res = requests.get(url)
     return res.text
