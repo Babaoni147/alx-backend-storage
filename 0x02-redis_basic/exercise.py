@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Module declares a redis class and methods"""
 import redis
 from uuid import uuid4
 from typing import Union, Callable, Optional, Any
@@ -9,6 +10,7 @@ def count_calls(method: Callable) -> Callable:
     """Decorator to count the number of calls to a method."""
     @wraps(method)
     def wrapper(self, *args, **kwargs):
+        """Wrapper function to count calls to a method."""
         key = method.__qualname__
         self._redis.incr(key)
         return method(self, *args, **kwargs)
@@ -19,6 +21,7 @@ def call_history(method: Callable) -> Callable:
     """Decorator to store the history of inputs and outputs for a method."""
     @wraps(method)
     def wrapper(self, *args, **kwargs):
+        """Wrapper function to store the history of inputs and outputs."""
         # Define Redis keys for storing inputs and outputs
         input_key = f"{method.__qualname__}:inputs"
         output_key = f"{method.__qualname__}:outputs"
@@ -59,7 +62,9 @@ def replay(fn: Callable):
 
 
 class Cache:
+    """Cache class to store data."""
     def __init__(self):
+        """Constructor method."""
         self._redis = redis.Redis()
         self._redis.flushdb()
 
@@ -72,11 +77,11 @@ class Cache:
         return key
 
     def get(self, key: str, fn: Optional[Callable[[bytes],
-                            Any]] = None) -> Any:
-          value = self._redis.get(key)
-          if value is None:
-              return None
-          return fn(value) if fn else value
+                                                  Any]] = None) -> Any:
+        value = self._redis.get(key)
+        if value is None:
+            return None
+        return fn(value) if fn else value
 
     def get_str(self, key: str) -> Optional[str]:
         return self.get(key, lambda v: v.decode('utf-8'))
